@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "Segoe UI Mono", monospace;
+
+  --color-background: #f6f7f3;
+  --color-surface: #ffffff;
+  --color-foreground: #0d1117;
+  --color-muted: #5b6470;
+  --color-border: #d7dde3;
+  --color-ring: #0ea5a4;
+
+  --color-primary: #0ea5a4;
+  --color-secondary: #1f2937;
+  --color-accent: #f59e0b;
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { @apply antialiased; }
+  body { @apply m-0 bg-background text-foreground font-sans; }
+  button, input, select, textarea { font: inherit; }
+}

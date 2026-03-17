@@ -22,7 +22,9 @@ venv/
 # --- Node / Web ---
 node_modules/
 dist/
+dist-electron/
 build/
+out/
 .next/
 coverage/
 .npm
