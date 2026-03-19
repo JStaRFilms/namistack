@@ -1,7 +1,7 @@
 {
   "name": "namistack",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Desktop FFmpeg workbench for visual command building, format conversion, and lossless merges.",
   "type": "module",
   "main": "dist-electron/main/index.js",
