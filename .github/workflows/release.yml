@@ -4,11 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Release tag to publish'
-        required: true
 
 permissions:
   contents: write
@@ -45,21 +40,11 @@ jobs:
       - name: Package portable EXE
         run: pnpm dist:portable
 
-      - name: Resolve release tag
-        id: release_meta
-        shell: pwsh
-        run: |
-          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
-            "tag=${{ github.event.inputs.tag }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-          } else {
-            "tag=${{ github.ref_name }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-          }
-
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.release_meta.outputs.tag }}
-          name: NamiStack ${{ steps.release_meta.outputs.tag }}
+          tag_name: ${{ github.ref_name }}
+          name: NamiStack ${{ github.ref_name }}
           generate_release_notes: true
           files: release/NamiStack-*-Portable.exe
         env:

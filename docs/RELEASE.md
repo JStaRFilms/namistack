@@ -28,15 +28,11 @@ git push origin v0.1.1
 
 That tag push triggers GitHub Actions automatically.
 
-### Option 2: Run The Workflow Manually
+### Option 2: Use The GitHub UI
 
-You can also use the GitHub Actions tab and run the release workflow manually.
+You can create the tag in GitHub first, then push it or let your local Git push it.
 
-Enter the tag you want to publish, for example:
-
-```text
-v0.1.1
-```
+The important part is that a `v*` tag reaches the remote repository, because that is what triggers the workflow.
 
 ## Before Releasing
 
@@ -59,4 +55,3 @@ That produces a single-file Windows executable in `release/`.
 
 - GitHub Release asset: `NamiStack-*-Portable.exe`
 - Local portable output: `release/`
-
