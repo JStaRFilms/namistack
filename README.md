@@ -61,6 +61,12 @@ Package Windows installers and portable builds:
 pnpm dist:win
 ```
 
+Build just the portable EXE:
+
+```bash
+pnpm dist:portable
+```
+
 ## FFmpeg Setup
 
 NamiStack tries to detect FFmpeg and FFprobe automatically. If that fails, open the Settings panel in the app and point it at:
@@ -93,7 +99,8 @@ Windows packaging is configured in `package.json` with:
 
 Build artifacts are written to `release/`.
 
+For the GitHub Actions release flow, see `docs/RELEASE.md`.
+
 ## Status
 
 The core FFmpeg workflow is implemented and the app is ready for packaging and release.
-
