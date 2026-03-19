@@ -25,6 +25,7 @@ dist/
 dist-electron/
 build/
 out/
+release/
 .next/
 coverage/
 .npm

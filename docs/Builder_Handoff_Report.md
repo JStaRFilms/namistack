@@ -5,6 +5,8 @@
 
 ## What Was Built
 
+Project name locked in as **NamiStack**.
+
 ### MUS Features Implemented
 - [x] FR-001: File picker + clip list with metadata
 - [x] FR-002: Shrink-to-size action builder

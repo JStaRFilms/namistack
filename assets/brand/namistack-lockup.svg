@@ -1,0 +1,16 @@
+<svg width="1200" height="320" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="320" rx="28" fill="#F6F7F3"/>
+  <g transform="translate(36,32)">
+    <rect width="256" height="256" rx="32" fill="#0D1117"/>
+    <rect x="28" y="28" width="200" height="200" rx="24" fill="#111923" stroke="#1C2A36" stroke-width="4"/>
+    <path d="M44 164H84L110 84L136 182L164 118L184 146H214" stroke="#10B4A7" stroke-width="16" stroke-linecap="square"/>
+    <path d="M44 74H120" stroke="#F59E0B" stroke-width="12" stroke-linecap="square"/>
+    <path d="M160 74H214" stroke="#E7ECEF" stroke-width="12" stroke-linecap="square"/>
+    <path d="M188 48V100" stroke="#E7ECEF" stroke-width="12" stroke-linecap="square"/>
+  </g>
+  <g transform="translate(346,86)">
+    <text x="0" y="78" fill="#0D1117" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="86" font-weight="700" letter-spacing="-2">NamiStack</text>
+    <text x="4" y="132" fill="#5B6470" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="26" font-weight="500" letter-spacing="4">DESKTOP FFMPEG WORKBENCH</text>
+    <text x="4" y="184" fill="#0D1117" font-family="'JetBrains Mono', Consolas, monospace" font-size="28">Build, preview, and run FFmpeg without memorizing flags.</text>
+  </g>
+</svg>

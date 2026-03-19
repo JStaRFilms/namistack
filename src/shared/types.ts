@@ -52,6 +52,11 @@ export type FlagDefinition = {
   placeholder?: string;
 };
 
+export type AppSettings = {
+  ffmpegPath: string;
+  ffprobePath: string;
+};
+
 export type WorkflowState = {
   action: ActionKind;
   clips: ClipMeta[];
@@ -85,6 +90,8 @@ export type FfmpegCapabilities = {
   flags: FlagDefinition[];
   hwaccels: string[];
   version: string;
+  source: 'auto' | 'manual';
+  settings: AppSettings;
 };
 
 export type JobStatus = 'idle' | 'running' | 'success' | 'error' | 'cancelled';

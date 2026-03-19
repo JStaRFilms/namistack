@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Name:** FFmpegUI
+**Name:** NamiStack
 **Mission:** Local desktop UI for building and running FFmpeg commands with simple toggles for common tasks.
 **Tech Stack:** Electron, React, TypeScript, Tailwind CSS, Node.js
 

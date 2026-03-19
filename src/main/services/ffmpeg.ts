@@ -1,5 +1,10 @@
 import { spawn } from 'child_process';
-import type { FfmpegCapabilities, FlagDefinition } from '../../shared/types';
+import { access } from 'fs/promises';
+import os from 'os';
+import path from 'path';
+import { defaultSettings } from '../../shared/defaults';
+import type { AppSettings, FfmpegCapabilities, FlagDefinition } from '../../shared/types';
+import { loadSettings } from './settings';
 
 const fallbackFlags: FlagDefinition[] = [
   {
@@ -71,6 +76,32 @@ const runBinary = (binary: string, args: string[]) =>
     });
   });
 
+const inferProbePath = (ffmpegPath: string) =>
+  path.join(path.dirname(ffmpegPath), process.platform === 'win32' ? 'ffprobe.exe' : 'ffprobe');
+
+const commonBinaryLocations = (binaryName: 'ffmpeg' | 'ffprobe') => {
+  const file = process.platform === 'win32' ? `${binaryName}.exe` : binaryName;
+  const home = os.homedir();
+  return [
+    path.join(home, 'ffmpeg', 'bin', file),
+    path.join(home, 'Downloads', 'ffmpeg', 'bin', file),
+    path.join(home, 'Downloads', 'ffmpeg-master-latest-win64-gpl', 'bin', file),
+    path.join('C:\\', 'ffmpeg', 'bin', file),
+    path.join('C:\\', 'tools', 'ffmpeg', 'bin', file),
+    path.join('C:\\Program Files', 'ffmpeg', 'bin', file),
+    path.join('C:\\Program Files (x86)', 'ffmpeg', 'bin', file)
+  ];
+};
+
+const pathExists = async (candidate: string) => {
+  try {
+    await access(candidate);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const detectBinary = async (binary: string) => {
   try {
     const result = await runBinary(binary, ['-version']);
@@ -85,6 +116,19 @@ const detectBinary = async (binary: string) => {
       version: ''
     };
   }
+};
+
+const detectFromCandidates = async (binaryName: 'ffmpeg' | 'ffprobe', candidates: string[]) => {
+  for (const candidate of candidates) {
+    if (!(await pathExists(candidate))) continue;
+    const detected = await detectBinary(candidate);
+    if (detected.path) return detected;
+  }
+
+  return {
+    path: null,
+    version: ''
+  };
 };
 
 const inferCategory = (name: string, description: string) => {
@@ -154,38 +198,85 @@ const readHwaccels = async (binary: string) => {
   }
 };
 
+const normalizeSettings = (settings?: AppSettings) => ({
+  ...defaultSettings,
+  ...(settings ?? {})
+});
+
+const resolveSettingsBinaries = async (settings: AppSettings) => {
+  const normalized = normalizeSettings(settings);
+  const manualFfmpeg = normalized.ffmpegPath ? await detectBinary(normalized.ffmpegPath) : { path: null, version: '' };
+  const manualProbePath =
+    normalized.ffprobePath || (manualFfmpeg.path ? inferProbePath(normalized.ffmpegPath) : '');
+  const manualFfprobe = manualProbePath ? await detectBinary(manualProbePath) : { path: null, version: '' };
+
+  if (manualFfmpeg.path) {
+    return {
+      ffmpeg: manualFfmpeg,
+      ffprobe: manualFfprobe,
+      source: 'manual' as const,
+      settings: normalized
+    };
+  }
+
+  const autoFfmpeg =
+    (await detectBinary('ffmpeg')).path
+      ? await detectBinary('ffmpeg')
+      : await detectFromCandidates('ffmpeg', commonBinaryLocations('ffmpeg'));
+
+  const autoProbeCandidates = [
+    normalized.ffprobePath,
+    autoFfmpeg.path ? inferProbePath(autoFfmpeg.path) : '',
+    'ffprobe',
+    ...commonBinaryLocations('ffprobe')
+  ].filter(Boolean) as string[];
+
+  const autoFfprobe = await detectFromCandidates('ffprobe', autoProbeCandidates);
+
+  return {
+    ffmpeg: autoFfmpeg,
+    ffprobe: autoFfprobe,
+    source: 'auto' as const,
+    settings: normalized
+  };
+};
+
 let cachedCapabilities: FfmpegCapabilities | null = null;
 
 export const loadCapabilities = async (): Promise<FfmpegCapabilities> => {
   if (cachedCapabilities) return cachedCapabilities;
 
-  const ffmpeg = await detectBinary('ffmpeg');
-  const ffprobe = await detectBinary('ffprobe');
+  const storedSettings = await loadSettings();
+  const resolved = await resolveSettingsBinaries(storedSettings);
 
-  if (!ffmpeg.path) {
+  if (!resolved.ffmpeg.path) {
     cachedCapabilities = {
       status: 'missing',
       ffmpegPath: null,
-      ffprobePath: ffprobe.path,
+      ffprobePath: resolved.ffprobe.path,
       flags: fallbackFlags,
       hwaccels: [],
-      version: ''
+      version: '',
+      source: resolved.source,
+      settings: resolved.settings
     };
     return cachedCapabilities;
   }
 
   const [flags, hwaccels] = await Promise.all([
-    readFlags(ffmpeg.path),
-    readHwaccels(ffmpeg.path)
+    readFlags(resolved.ffmpeg.path),
+    readHwaccels(resolved.ffmpeg.path)
   ]);
 
   cachedCapabilities = {
     status: 'ready',
-    ffmpegPath: ffmpeg.path,
-    ffprobePath: ffprobe.path,
+    ffmpegPath: resolved.ffmpeg.path,
+    ffprobePath: resolved.ffprobe.path,
     flags,
     hwaccels,
-    version: ffmpeg.version
+    version: resolved.ffmpeg.version,
+    source: resolved.source,
+    settings: resolved.settings
   };
 
   return cachedCapabilities;

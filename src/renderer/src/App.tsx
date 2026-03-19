@@ -4,6 +4,7 @@ import { ActionRail } from './features/workflow/ActionRail';
 import { CommandPanel } from './features/workflow/CommandPanel';
 import { FlagsPanel } from './features/workflow/FlagsPanel';
 import { JobPanel } from './features/workflow/JobPanel';
+import { SettingsPanel } from './features/workflow/SettingsPanel';
 import { useWorkflow } from './features/workflow/useWorkflow';
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
     job,
     busy,
     error,
+    settings,
     openFiles,
     selectOutputDirectory,
     setAction,
@@ -21,6 +23,9 @@ export default function App() {
     updateConvert,
     updateMerge,
     updateOutput,
+    updateSettings,
+    browseBinary,
+    saveAppSettings,
     setFlagEnabled,
     setFlagValue,
     runWorkflow,
@@ -38,8 +43,8 @@ export default function App() {
         <header className="border-b border-border bg-[rgba(246,247,243,0.94)]">
           <div className="mx-auto flex max-w-[1480px] items-center justify-between px-6 py-5">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.28em] text-muted">FFmpegUI</p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight">Desktop command builder for people who hate flags.</h1>
+              <p className="text-[11px] uppercase tracking-[0.28em] text-muted">NamiStack</p>
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight">NamiStack: desktop FFmpeg workbench for people who hate flags.</h1>
             </div>
             <div className="flex items-center gap-3">
               <div className="border border-border bg-surface px-3 py-2 text-xs">
@@ -85,8 +90,21 @@ export default function App() {
                   <span>Flags indexed</span>
                   <span className="text-xs text-muted">{capabilities?.flags.length ?? 0}</span>
                 </div>
+                <div className="flex items-center justify-between">
+                  <span>Detection</span>
+                  <span className="text-xs text-muted">{capabilities?.source ?? 'auto'}</span>
+                </div>
               </div>
             </section>
+
+            <SettingsPanel
+              capabilities={capabilities}
+              settings={settings}
+              saving={busy.capabilities}
+              onChange={updateSettings}
+              onBrowse={browseBinary}
+              onSave={saveAppSettings}
+            />
           </aside>
 
           <section className="col-span-12 space-y-6 xl:col-span-6">

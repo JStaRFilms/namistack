@@ -17,7 +17,7 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    console.error('[ffmpegui] render crash', error, info.componentStack);
+    console.error('[namistack] render crash', error, info.componentStack);
   }
 
   render() {
@@ -33,7 +33,7 @@ class ErrorBoundary extends React.Component<
             fontFamily: '"IBM Plex Sans", system-ui, sans-serif'
           }}
         >
-          <h1 style={{ margin: '0 0 12px', fontSize: '24px' }}>FFmpegUI failed to render</h1>
+          <h1 style={{ margin: '0 0 12px', fontSize: '24px' }}>NamiStack failed to render</h1>
           <p style={{ margin: '0 0 16px', fontSize: '14px' }}>
             The app hit a renderer error before the UI could load.
           </p>
@@ -58,14 +58,14 @@ class ErrorBoundary extends React.Component<
 }
 
 window.addEventListener('error', (event) => {
-  console.error('[ffmpegui] window error', event.error || event.message);
+  console.error('[namistack] window error', event.error || event.message);
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('[ffmpegui] unhandled rejection', event.reason);
+  console.error('[namistack] unhandled rejection', event.reason);
 });
 
-console.log('[ffmpegui] renderer bootstrap');
+console.log('[namistack] renderer bootstrap');
 
 const root = document.getElementById('root');
 

@@ -1,4 +1,9 @@
-import type { CommandPreview, JobSnapshot, WorkflowState } from './types';
+import type { AppSettings, CommandPreview, JobSnapshot, WorkflowState } from './types';
+
+export const defaultSettings: AppSettings = {
+  ffmpegPath: '',
+  ffprobePath: ''
+};
 
 export const defaultWorkflowState: WorkflowState = {
   action: 'shrink',

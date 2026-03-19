@@ -1,7 +1,13 @@
 import { startTransition, useEffect, useState } from 'react';
-import { defaultWorkflowState, emptyCommandPreview, emptyJobSnapshot } from '../../../../shared/defaults';
+import {
+  defaultSettings,
+  defaultWorkflowState,
+  emptyCommandPreview,
+  emptyJobSnapshot
+} from '../../../../shared/defaults';
 import type {
   ActionKind,
+  AppSettings,
   ClipMeta,
   CommandPreview,
   ConvertSettings,
@@ -21,16 +27,28 @@ const dirname = (filePath: string) => {
 const nextWorkflowAfterClips = (current: WorkflowState, clips: ClipMeta[]): WorkflowState => {
   if (clips.length === 0) return current;
 
-  const outputDirectory = current.outputDirectory || dirname(clips[0].path);
+  const mergedClips = [...current.clips];
+
+  for (const clip of clips) {
+    const existingIndex = mergedClips.findIndex((currentClip) => currentClip.path === clip.path);
+    if (existingIndex >= 0) {
+      mergedClips[existingIndex] = clip;
+    } else {
+      mergedClips.push(clip);
+    }
+  }
+
+  const outputDirectory = current.outputDirectory || dirname(mergedClips[0].path);
   return {
     ...current,
-    clips,
+    clips: mergedClips,
     outputDirectory
   };
 };
 
 export const useWorkflow = () => {
   const [workflow, setWorkflow] = useState<WorkflowState>(defaultWorkflowState);
+  const [settings, setSettings] = useState<AppSettings>(defaultSettings);
   const [capabilities, setCapabilities] = useState<FfmpegCapabilities | null>(null);
   const [preview, setPreview] = useState<CommandPreview>(emptyCommandPreview);
   const [job, setJob] = useState<JobSnapshot>(emptyJobSnapshot);
@@ -44,11 +62,11 @@ export const useWorkflow = () => {
 
   useEffect(() => {
     let active = true;
-    window.ffmpegUI
-      .loadCapabilities()
-      .then((result) => {
+    Promise.all([window.ffmpegUI.loadSettings(), window.ffmpegUI.loadCapabilities()])
+      .then(([loadedSettings, result]) => {
         if (!active) return;
         startTransition(() => {
+          setSettings(loadedSettings);
           setCapabilities(result);
           setBusy((current) => ({ ...current, capabilities: false }));
         });
@@ -117,6 +135,35 @@ export const useWorkflow = () => {
     const selected = await window.ffmpegUI.selectOutputDirectory();
     if (!selected) return;
     setWorkflow((current) => ({ ...current, outputDirectory: selected }));
+  };
+
+  const updateSettings = (patch: Partial<AppSettings>) => {
+    setSettings((current) => ({
+      ...current,
+      ...patch
+    }));
+  };
+
+  const browseBinary = async (target: keyof AppSettings) => {
+    const selected = await window.ffmpegUI.selectBinary();
+    if (!selected) return;
+    updateSettings({ [target]: selected });
+  };
+
+  const saveAppSettings = async () => {
+    setBusy((current) => ({ ...current, capabilities: true }));
+    setError(null);
+    try {
+      const nextCapabilities = await window.ffmpegUI.saveSettings(settings);
+      startTransition(() => {
+        setCapabilities(nextCapabilities);
+        setSettings(nextCapabilities.settings);
+        setBusy((current) => ({ ...current, capabilities: false }));
+      });
+    } catch (err) {
+      setBusy((current) => ({ ...current, capabilities: false }));
+      setError(err instanceof Error ? err.message : 'Failed to save settings.');
+    }
   };
 
   const setAction = (action: ActionKind) => {
@@ -197,6 +244,7 @@ export const useWorkflow = () => {
     job,
     busy,
     error,
+    settings,
     openFiles,
     selectOutputDirectory,
     setAction,
@@ -204,6 +252,9 @@ export const useWorkflow = () => {
     updateConvert,
     updateMerge,
     updateOutput,
+    updateSettings,
+    browseBinary,
+    saveAppSettings,
     setFlagEnabled,
     setFlagValue,
     runWorkflow,
