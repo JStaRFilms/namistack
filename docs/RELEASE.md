@@ -14,6 +14,7 @@ When it runs, it:
 - builds the Electron app
 - packages a Windows portable EXE
 - uploads the EXE to the GitHub Release for the matching tag
+- uses Node 24-compatible GitHub Actions so the release job stays future-proof
 
 ## How To Trigger A Release
 
