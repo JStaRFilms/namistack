@@ -2,6 +2,8 @@
 
 NamiStack is a desktop FFmpeg workbench for Windows. It gives you a visual way to open media files, choose actions like shrink, convert, or merge, and run FFmpeg without memorizing a wall of flags.
 
+![NamiStack full UI](assets/screenshots/full-ui.png)
+
 ## What It Does
 
 - Open one or many media files with a native file picker
@@ -14,6 +16,16 @@ NamiStack is a desktop FFmpeg workbench for Windows. It gives you a visual way t
 - Watch progress and logs while jobs run
 - Auto-detect FFmpeg/FFprobe from PATH or common Windows install locations
 - Override FFmpeg paths manually in Settings if needed
+
+## Demo
+
+**Shrink a clip** — pick a file, set a target size, preview the command, run it.
+
+![Shrink workflow](assets/screenshots/shrink-clip.gif)
+
+**Advanced flags** — toggle common FFmpeg options with a searchable UI.
+
+![Advanced flags](assets/screenshots/advanced-flags.gif)
 
 ## Tech Stack
 
@@ -69,7 +81,9 @@ pnpm dist:portable
 
 ## FFmpeg Setup
 
-NamiStack tries to detect FFmpeg and FFprobe automatically. If that fails, open the Settings panel in the app and point it at:
+NamiStack tries to detect FFmpeg and FFprobe automatically. If that fails, open the Settings panel and point it at the right paths.
+
+![FFmpeg settings](assets/screenshots/ffmpeg-settings.png)
 
 - `ffmpeg.exe`
 - `ffprobe.exe`
